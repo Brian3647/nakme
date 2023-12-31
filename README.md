@@ -65,5 +65,5 @@ this project is licensed under either the [MIT license](LICENSE-MIT) or the [Apa
 all the api docs can be found in [docs/README.md](docs/README.md)
 
 ```
-
+happy coding!
 ```
