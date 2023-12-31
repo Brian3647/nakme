@@ -45,7 +45,7 @@ Response:
 
 ```go
 {
-    ok bool // <- always true, it will return an error if something went wrong
+    ok string // <- always "true", it will return an error if something went wrong
 }
 ```
 
@@ -65,7 +65,7 @@ Response:
 
 ```go
 {
-    ok bool // <- always true, it will return an error if the token is invalid
+    ok string // <- always "true", it will return an error if the token is invalid
 }
 ```
 
@@ -107,6 +107,6 @@ Response:
 
 ```go
 {
-    ok bool // <- always true, it will return an error if the token is invalid
+    ok string // <- always "true", it will return an error if the token is invalid
 }
 ```

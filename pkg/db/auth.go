@@ -1,7 +1,10 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
+	"sync"
 	"time"
 
 	"github.com/Brian3647/nakme/pkg/util"
@@ -17,7 +20,14 @@ type TempUser struct {
 }
 
 var (
-	pendingAccounts map [string] TempUser
+	PendingAccounts map [string] TempUser
+	PendingAccountsMutex sync.RWMutex
+)
+
+var (
+    selectUserByEmailStmt *sql.Stmt
+    insertUserStmt        *sql.Stmt
+    deleteUserByEmailStmt *sql.Stmt
 )
 
 func GenerateToken(email string, username string) (string, error) {
@@ -39,7 +49,7 @@ func SignUp(username string, password string, email string) error {
         return err
     }
 
-    if _, ok := pendingAccounts[email]; ok {
+    if _, ok := PendingAccounts[email]; ok {
 		return fmt.Errorf("email already in use")
     }
 
@@ -47,25 +57,21 @@ func SignUp(username string, password string, email string) error {
 	   return err
     }
 
-	stmt, err := db.Prepare("SELECT id FROM users WHERE email = $1"); if err != nil {
-		return err
-	}
-
-	defer stmt.Close()
-
 	var id uint
-	err = stmt.QueryRow(email).Scan(&id); if err == nil {
+	err = selectUserByEmailStmt.QueryRow(email).Scan(&id); if err == nil {
 		return fmt.Errorf("email already in use")
 	}
 
-	pendingAccounts[email] = TempUser{
+	PendingAccountsMutex.Lock()
+	PendingAccounts[email] = TempUser{
 		Username: username,
 		Token: token,
 		HashedPassword: hashedPassword,
 	}
+	PendingAccountsMutex.Unlock()
 
 	time.AfterFunc(time.Hour, func() {
-		delete(pendingAccounts, email)
+		delete(PendingAccounts, email)
 	})
 
 	return util.SendMail(email, "nakme: Confirm your account",
@@ -77,23 +83,18 @@ func SignUp(username string, password string, email string) error {
 }
 
 func ConfirmSignUp(email string, token string) error {
-	account, ok := pendingAccounts[email]
+	PendingAccountsMutex.RLock()
+    account, ok := PendingAccounts[email]
+    PendingAccountsMutex.RUnlock()
+
     if !ok || account.Token != token {
         return fmt.Errorf("invalid or expired token")
     }
 
-	delete(pendingAccounts, email)
-
-	query := "INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id"
-
-	stmt, err := db.Prepare(query); if err != nil {
-		return err
-	}
-
-	defer stmt.Close()
+	delete(PendingAccounts, email)
 
 	var id uint
-	err = stmt.QueryRow(account.Username, account.HashedPassword, email).Scan(&id); if err != nil {
+	err := insertUserStmt.QueryRow(account.Username, account.HashedPassword, email).Scan(&id); if err != nil {
 		return err
 	}
 
@@ -102,17 +103,10 @@ func ConfirmSignUp(email string, token string) error {
 
 // logs in an user and returns its JWT & usernameemail
 func LogIn(email string, password string) (jwtoken string, uname string, e error) {
-	query := "SELECT password, id, username FROM users WHERE email = $1"
-	stmt, err := db.Prepare(query); if err != nil {
-		return "", "", err
-	}
-
-	defer stmt.Close()
-
 	var hashedPassword string
 	var id uint
 	var username string
-	err = stmt.QueryRow(email).Scan(&hashedPassword, &id, &username); if err != nil {
+	err := selectUserByEmailStmt.QueryRow(email).Scan(&hashedPassword, &id, &username); if err != nil {
 		return "", "", err
 	}
 
@@ -144,6 +138,35 @@ func ConfirmIdentity(token string) error {
     }
 }
 
+func DeleteAccount(email string, token string) error {
+	err := ConfirmIdentity(token); if err != nil {
+		return err
+	}
+
+	_, err = deleteUserByEmailStmt.Exec(email); if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func SetUpAuth() {
-	pendingAccounts = make(map[string] TempUser)
+    var err error
+
+    PendingAccounts = make(map[string]TempUser)
+
+    selectUserByEmailStmt, err = db.Prepare("SELECT id FROM users WHERE email = $1")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    insertUserStmt, err = db.Prepare("INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING id")
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    deleteUserByEmailStmt, err = db.Prepare("DELETE FROM users WHERE email = $1")
+    if err != nil {
+        log.Fatal(err)
+    }
 }

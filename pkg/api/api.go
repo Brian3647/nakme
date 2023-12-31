@@ -40,4 +40,5 @@ func AddRoutes(e *echo.Echo) {
 	e.POST("/api/auth/confirm_token", auth.ConfirmToken)
 	e.GET("/api/auth/confirm_email", auth.ConfirmEmail)
 	e.POST("/api/auth/login", auth.LogIn)
+	e.POST("/api/auth/delete", auth.DeleteUser)
 }
