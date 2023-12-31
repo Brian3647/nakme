@@ -33,6 +33,10 @@ func AddRoutes(e *echo.Echo) {
 		return c.String(http.StatusOK, "Hello, World!\n")
 	})
 
+	e.GET("/api", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, c.Echo().Routes())
+	})
+
 	e.GET("/health", Health)
 	e.GET("/api/health", Health)
 

@@ -56,6 +56,22 @@ Response:
 }
 ```
 
+**GET** `/api/`
+
+Returns a list of all the routes of the server.
+
+Response:
+
+```go
+[
+    {
+        name string,
+        path string,
+        method string
+    }
+]
+```
+
 ## User management
 
 ### Sign up
