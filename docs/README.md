@@ -20,7 +20,7 @@ Optional strings (marked with `// <- optional`) can be sent as empty strings (`"
 }
 ```
 
-If the response has any status code that isn't between 200 and 399, you can safely handle it as an error. Any response with this body:
+If the response has any status code that isn't between 200 and 399, you can safely handle it as an error (see above). Any response with this body:
 
 ```go
 {
@@ -44,6 +44,18 @@ Use the `Authorization: Bearer <JWT TOKEN>` header. (don't actually put `<` and 
 
 So that even if they're decoded, they don't contain any sensitive information. That being said, do NOT send tokens to other people, as they can still use them in the API.
 
+## Miscelaneous
+
+**GET** `/api/health` or `/api/health`
+
+Response:
+
+```go
+{
+    ok string // <- as said above, this is always "true"
+}
+```
+
 ## User management
 
 ### Sign up
@@ -51,7 +63,7 @@ So that even if they're decoded, they don't contain any sensitive information. T
 **POST** `/api/auth/signup`
 
 An emaill will be sent to the user with a confirmation link. The user will be able to log in only after confirming their email.
-Note the confirmation link will be valid for only 1 hour.
+Note the confirmation link will be valid for only 1 hour. When the link expires, the user will have to sign up again. The database isn't actually changed until the user confirms their email.
 
 Body:
 

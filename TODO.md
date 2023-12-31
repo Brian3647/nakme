@@ -1,5 +1,6 @@
 # TODO
 
+- [x] Basic user auth API (signup, login, confirm email, delete account)
 - [ ] Clarify app idea
 - [ ] Basic website functionality
 - [ ] Get a domain
