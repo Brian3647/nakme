@@ -62,7 +62,7 @@ Response:
 
 **POST** `/api/auth/signup`
 
-An emaill will be sent to the user with a confirmation link. The user will be able to log in only after confirming their email.
+An email will be sent to the user with a confirmation link. The user will be able to log in only after confirming their email.
 Note the confirmation link will be valid for only 1 hour. When the link expires, the user will have to sign up again. The database isn't actually changed until the user confirms their email.
 
 Body:
