@@ -12,7 +12,7 @@ unless it's something very, very big, normally it's hard to find people to work 
 
 ## how?
 
-the backend is built with [go](https://golang.org/) (specifically [echo](https://echo.labstack.com/)). The frontend is yet to be started, but it will probably be build with something very simple like [vue](https://vuejs.org/).
+the backend is built with [go](https://golang.org/) (specifically [echo](https://echo.labstack.com/)). The frontend is yet to be started, but it will probably be build with something very simple like [vue](https://vuejs.org/) or go templates + htmx.
 
 ## how to run
 
