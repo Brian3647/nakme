@@ -1,12 +1,14 @@
 package util
 
 import (
+	"errors"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"gopkg.in/gomail.v2"
 )
 
@@ -102,4 +104,17 @@ func SendMail(to string, subject string, body string) error {
 
 func GetBaseUrl() string {
 	return baseUrl
+}
+
+func ExpectAuth(c echo.Context) (string, error) {
+    token := c.Request().Header.Get("Authorization")
+    if token == "" {
+        return "", errors.New("missing Authorization header")
+    }
+
+    if !strings.HasPrefix(token, "Bearer ") {
+        return "", errors.New("invalid Authorization header format (expected Bearer)")
+    }
+
+    return strings.TrimSpace(strings.Replace(token, "Bearer ", "", 1)), nil
 }

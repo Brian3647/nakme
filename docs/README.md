@@ -20,11 +20,33 @@ Optional strings (marked with `// <- optional`) can be sent as empty strings (`"
 }
 ```
 
-If the response has any status code that isn't between 200 and 399, you can safely handle it as an error.
+If the response has any status code that isn't between 200 and 399, you can safely handle it as an error. Any response with this body:
 
-## Authentication
+```go
+{
+    ok string
+}
+```
 
-## Sign up
+will always be a success (you can safely assert that `ok == "true"`). If any errors happen, the response will have a different body (see above).
+
+## General Authorization
+
+Use the `Authorization: Bearer <JWT TOKEN>` header. (don't actually put `<` and `>` in the header). JWT tokens are good because even though anyone can read them, only server generated tokens are valid due to their signature. The tokens passed have this payload:
+
+```go
+{
+    iat int, // <- issued at (date of creation)
+    name string, // <- username
+    sub string, // <- user id
+}
+```
+
+So that even if they're decoded, they don't contain any sensitive information. That being said, do NOT send tokens to other people, as they can still use them in the API.
+
+## User management
+
+### Sign up
 
 **POST** `/api/auth/signup`
 
@@ -45,31 +67,23 @@ Response:
 
 ```go
 {
-    ok string // <- always "true", it will return an error if something went wrong
+    ok string
 }
 ```
 
 ### Confirm email
 
-**POST** `/api/auth/confirm_email`
-
-Body:
-
-```go
-{
-    token string
-}
-```
+**GET** `/api/auth/confirm_email?token=JWT_TOKEN&email=EMAIL`
 
 Response:
 
 ```go
 {
-    ok string // <- always "true", it will return an error if the token is invalid
+    ok string
 }
 ```
 
-## Log in
+### Log in
 
 **POST** `/api/auth/login`
 
@@ -91,22 +105,38 @@ Response:
 }
 ```
 
-## Check if token is valid (confirm identity)
+### Check if token is valid (confirm identity)
 
 **POST** `/api/auth/confirm_identity`
 
-Body:
-
-```go
-{
-    token string
-}
-```
+No body required, but it needs to have [authorization](#general-authorization).
 
 Response:
 
 ```go
 {
-    ok string // <- always "true", it will return an error if the token is invalid
+    ok string
+}
+```
+
+### Delete account
+
+**POST** `/api/auth/delete`
+
+Both the token and the email are required for this request. The email is sent via the body:
+
+```go
+{
+    email string
+}
+```
+
+And the token is sent via the [authorization](#general-authorization) header.
+
+Response:
+
+```go
+{
+    ok string
 }
 ```

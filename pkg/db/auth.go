@@ -101,12 +101,12 @@ func ConfirmSignUp(email string, token string) error {
 	return nil
 }
 
-// logs in an user and returns its JWT & usernameemail
-func LogIn(email string, password string) (jwtoken string, uname string, e error) {
+// logs in an user and returns its JWT & username
+func LogIn(email string, password string) (string, string, error) {
 	var hashedPassword string
 	var id uint
 	var username string
-	err := selectUserByEmailStmt.QueryRow(email).Scan(&hashedPassword, &id, &username); if err != nil {
+	err := selectUserByEmailStmt.QueryRow(email).Scan(&hashedPassword, &username, &id); if err != nil {
 		return "", "", err
 	}
 
@@ -155,7 +155,7 @@ func SetUpAuth() {
 
     PendingAccounts = make(map[string]TempUser)
 
-    selectUserByEmailStmt, err = db.Prepare("SELECT id FROM users WHERE email = $1")
+    selectUserByEmailStmt, err = db.Prepare("SELECT password, username, id FROM users WHERE email = $1")
     if err != nil {
         log.Fatal(err)
     }
