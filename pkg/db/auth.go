@@ -93,7 +93,7 @@ func ConfirmSignUp(email string, token string) error {
 
 	delete(PendingAccounts, email)
 
-	var id uint
+	var id string
 	err := insertUserStmt.QueryRow(account.Username, account.HashedPassword, email).Scan(&id); if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func ConfirmSignUp(email string, token string) error {
 // logs in an user and returns its JWT & username
 func LogIn(email string, password string) (string, string, error) {
 	var hashedPassword string
-	var id uint
+	var id string
 	var username string
 	err := selectUserByEmailStmt.QueryRow(email).Scan(&hashedPassword, &username, &id); if err != nil {
 		return "", "", err

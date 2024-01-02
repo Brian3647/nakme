@@ -48,16 +48,31 @@ func main() {
         log.Fatal(err)
     }
 
-	db.Exec("DROP TABLE users;")
+	exec(db, `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`)
 
-    exec(db, `CREATE TABLE users (
-        id serial PRIMARY KEY,
+	db.Exec("DROP TABLE users;")
+	db.Exec("DROP TABLE posts;")
+
+	exec(db, `CREATE TABLE users (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         username VARCHAR(100) NOT NULL,
 		email VARCHAR(100) NOT NULL UNIQUE,
         password bytea NOT NULL, -- hashed
         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    );`)
+	);`)
+
+	exec(db, `CREATE TABLE posts (
+		id serial PRIMARY KEY,
+		user_id UUID NOT NULL,
+		link VARCHAR(120) NOT NULL,
+		description VARCHAR(200) NOT NULL DEFAULT '',
+		created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (user_id) REFERENCES users(id)
+	);`)
+
+	exec(db, `CREATE INDEX idx_posts_user_id ON posts(user_id);`)
 
     defer db.Close()
 }

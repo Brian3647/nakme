@@ -3,7 +3,7 @@
 - [x] Basic user auth API (signup, login, confirm email, delete account)
 - [x] Clarify app idea
 - [ ] Posts API (create, get, update, delete)
-- [ ] Comments API (..)
+- [ ] Comments API (..) -- maybe not
 - [ ] Improve project recommendations
 - [ ] Improve search
 - [ ] Advanced user API (profiles, shared settings, bios, etc.)

@@ -25,9 +25,9 @@ the backend is built with [go](https://golang.org/) (specifically [echo](https:/
 ### steps
 
 1. clone the repo
-2. `cd` into the repo
+2. `cd` into the repo's `db` directory
 3. change `setup.go` to your needs (password, port, etc.) and run it with `go run setup.go`
-4. cd back into the repo's directory
+4. cd back into the main repo's directory
 5. copy `.env.template` to `.env` and add your credentials
 6. run `go run main.go`
 
@@ -65,5 +65,5 @@ this project is licensed under either the [MIT license](LICENSE-MIT) or the [Apa
 all the api docs can be found in [docs/README.md](docs/README.md)
 
 ```
-happy coding!
+happy coding
 ```

@@ -68,7 +68,7 @@ Response:
         name string,
         path string,
         method string
-    }
+    }*
 ]
 ```
 
